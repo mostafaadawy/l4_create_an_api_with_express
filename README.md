@@ -215,3 +215,69 @@ We're getting close to a fully operational API! In the last lesson we began to w
 - We tie everything together by calling model methods in the handler functions
 
 --------------------------------------
+## 8- Exercise Routes to Models Tasks
+In this exercise we will take the REST routes we created for articles in the last exercise and move them into their own handler file, then we'll have each route call a specific model method
+### Task List
+- (✓)Create the handler file and move the article routes from the server file into it
+- (✓)In each handler function, call the correct model method and pass the response back as res.json()
+- (✓)Make sure to add the reference to the handler file in the server file so the routes can be found
+### Article Routes
+If you need the routes we created as part of the last exercise, here they are again for you.
+```sh
+app.get('/articles', (req: Request, res: Response) => {
+    try {
+        res.send('this is the INDEX route')
+    } catch (err) {
+        res.status(400)
+        res.json(err)
+    }
+})
+
+app.get('/articles/:id', (req: Request, res: Response) => {
+    try {
+       res.send('this is the SHOW route')
+    } catch (err) {
+       res.status(400)
+       res.json(err)
+    }
+})
+
+app.post('/articles', (req: Request, res: Response) => {
+    const article: Article = {
+      title: req.body.title,
+      content: req.body.content
+    }
+    try {
+       res.send('this is the CREATE route')
+    } catch (err) {
+       res.status(400)
+       res.json(err)
+    }
+})
+
+app.put('/articles/:id', (req: Request, res: Response) => {
+    const article: Article = {
+      id: req.params.id, 
+      title: req.body.title,
+      content: req.body.content
+    }
+    try {
+       res.send('this is the EDIT route')
+    } catch (err) {
+       res.status(400)
+       res.json(err)
+    }
+})
+
+app.delete('/articles/:id', (req: Request, res: Response) => {
+    try {
+       res.send('this is the DELETE route')
+    } catch (err) {
+       res.status(400)
+       res.json(err)
+    }
+}
+
+```
+
+***`very important`*** the difference is i will not use routes folder and instead i will make handler folder to make for every model a handeler this can meet the controoller folder but instead of sending to view html file it sends a json respoce
