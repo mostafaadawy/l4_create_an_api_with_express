@@ -281,3 +281,142 @@ app.delete('/articles/:id', (req: Request, res: Response) => {
 ```
 
 ***`very important`*** the difference is i will not use routes folder and instead i will make handler folder to make for every model a handeler this can meet the controoller folder but instead of sending to view html file it sends a json respoce
+
+--------------------------------------
+## 9-Exercise Solution
+
+Here is an example handler file with model methods:
+```sh
+import express, { Request, Response } from 'express'
+import { Article, ArticleStore } from '../models/article'
+
+const store = new ArticleStore()
+
+const index = async (_req: Request, res: Response) => {
+  const articles = await store.index()
+  res.json(articles)
+}
+
+const show = async (req: Request, res: Response) => {
+   const article = await store.show(req.body.id)
+   res.json(article)
+}
+
+const create = async (req: Request, res: Response) => {
+    try {
+        const article: Article = {
+            title: req.body.title,
+            content: req.body.content,
+        }
+
+        const newArticle = await store.create(article)
+        res.json(newArticle)
+    } catch(err) {
+        res.status(400)
+        res.json(err)
+    }
+}
+
+const destroy = async (req: Request, res: Response) => {
+    const deleted = await store.delete(req.body.id)
+    res.json(deleted)
+}
+
+const articleRoutes = (app: express.Application) => {
+  app.get('/articles', index)
+  app.get('/articles/:id', show)
+  app.post('/articles', create)
+  app.delete('/articles', destroy)
+}
+
+export default articleRoutes
+```
+--------------------------------------
+
+## 10-Fullstack Big Picture - CRUD to REST to HTTP Requests
+### Video Summary
+- Express handles incoming HTTP requests to the API and the handler functions call model methods
+- Model methods query the database and send the information back to the - handler, which parses it into json and sends the HTTP response
+
+### Full Stack Process
+|FrontEnd|<--->|Routes|<--->|Models|<--->|DATABASE|
+|---|---|---|---|---|---|---|
+
+-------------------------------------------
+## 11-Quiz: CRUD to REST to HTTP Requests
+### Question 1 of 3
+Starting with an incoming request, put the pieces in the order the would be called
+- (✓) Request -> Handler -> Model -> Database table -> Model -> Handler -> Response
+- Request -&gt; Model -&gt; Handler -&gt; Database table -&gt; Model -&gt; Handler -&gt; Response
+- Request -&gt; Handler -&gt;  Database table -&gt; Handler -&gt; Response
+- Request -&gt; Handler -&gt; Model -&gt; Database table -&gt;  Response
+### Question 2 of 3
+Which part of the API handles incoming requests?
+- Model files
+- (✓) Express routes/handler function files
+- (✓) Server file
+- Database file
+- Package JSON file
+
+### Question 3 of 3
+Which part of the API creates database queries?
+- (✓) Model files
+- Express routes/handler function files
+- Server file
+- Database file
+- Package JSON file
+
+--------------------------------------
+
+## 12- Conclusion
+Great job! In this course we've built the client-facing sections of an API, here's a look back at what we did:
+- Implemented RESTful API structure
+- Created Express functions for incoming requests
+- Organized Express routes into handlers
+- Mapped RESTful routes to model methods
+- Added endpoint tests
+### Glossary
+- ***CORS*** - Cross Origin Resource Sharing is required by browsers in order to access an API
+### Going Further
+- For more about REST, here is a good [RESTFUL API Article](https://restfulapi.net/) to get you started.
+
+-----------------------------------------------------------
+
+# Very Important Problem i faced what is is what is happen how we solve it
+# The Problem
+actually there was two problems 
+1. post frm postman not working with express
+2. every request works except ***`post`***
+
+# The reseon
+## Reseon and Solution for First Problem
+this problem because of missing middleware such as 
+```sh
+app.use(express.json({ type: 'application/json' }))
+```
+but i used 
+```sh
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
+```
+this middleware extracts and sringfyies the request to extract the body
+but it only solved urlencoded not form-data and there are other middlewares used to parse the multi-parts data-form
+
+## Reseon and Solution for Second Problem
+
+many errors like 
+- error in name of table  
+- error in number of columons wrt assigned values
+
+## all of these error was not the main reason but the main error was
+
+***`error: permission denied for sequence articles_id_seq`***
+# Actually the main Solution method was console.log(err) in catch
+***`to insert console.log(err) catched in the catch of the try of the code that makes me see the error where before that action i was blind not seeing the error to search for it once i catched it and gogled for it i found that it needs the next grant`***
+```sh
+psql -U postgres
+\c full_stack_dev
+ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO full_stack_user;
+\q
+```
+and this makes my code works well
